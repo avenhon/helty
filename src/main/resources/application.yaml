@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: healthmaxxing
+  datasource:
+    url: jdbc:postgresql://localhost:5432/healthmaxxing_db
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: "|I:^tX.Lr}pP}0%pY33#a(Q^H*$lu954H)G^D%%|m=o"
+  expiration: 360000
