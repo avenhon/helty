@@ -3,6 +3,7 @@ package com.avenhon.healthmaxxing.service;
 import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.exception.UserAlreadyExistsException;
 import com.avenhon.healthmaxxing.exception.UserNotFoundException;
+import com.avenhon.healthmaxxing.exception.UsernameAlreadyTakenException;
 import com.avenhon.healthmaxxing.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,8 +29,12 @@ public class UserService {
     }
 
     public String createUser(String email, String username, String rawPassword) throws UserAlreadyExistsException {
-        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(email)) {
             throw new UserAlreadyExistsException(email);
+        }
+
+        if (userRepository.existsByUsername(username)) {
+            throw new UsernameAlreadyTakenException(username);
         }
 
         User user = new User(

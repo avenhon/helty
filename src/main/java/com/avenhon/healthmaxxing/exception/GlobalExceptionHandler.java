@@ -29,6 +29,13 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
+    @ExceptionHandler(UsernameAlreadyTakenException.class)
+    public ResponseEntity<String> handleUsernameAlreadyTaken(UsernameAlreadyTakenException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
+
     @ExceptionHandler(MetricsAlreadyExistsException.class)
     public ResponseEntity<String> handleMetricsAlreadyExistsException(MetricsAlreadyExistsException ex) {
         return ResponseEntity
