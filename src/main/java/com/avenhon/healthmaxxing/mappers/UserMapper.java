@@ -19,6 +19,7 @@ public class UserMapper {
                     m.getHeight(),
                     m.getWeight(),
                     m.getBmi(),
+                    m.getSteps(),
                     m.getLocalDate()
             )));
         }

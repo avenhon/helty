@@ -11,6 +11,7 @@ public class MetricsMapper {
               metrics.getHeight(),
               metrics.getWeight(),
               metrics.getBmi(),
+              metrics.getSteps(),
               metrics.getLocalDate()
       );
     }

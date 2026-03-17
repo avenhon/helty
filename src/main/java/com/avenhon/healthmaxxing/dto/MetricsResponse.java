@@ -10,5 +10,6 @@ public record MetricsResponse(
         float height,
         float weight,
         float bmi,
+        Integer steps,
         LocalDate localDate
 ) {}

@@ -13,6 +13,7 @@ public class Metrics {
     private Sex sex;
     private float height;
     private float weight;
+    private Integer steps;
 
     @Column(unique = true, nullable = false)
     private LocalDate localDate;
@@ -23,10 +24,11 @@ public class Metrics {
 
     public Metrics() {}
 
-    public Metrics(Sex sex, float height, float weight) {
+    public Metrics(Sex sex, float height, float weight, Integer steps) {
         this.sex = sex;
         this.height = height;
         this.weight = weight;
+        this.steps = steps;
     }
 
     public Long getId() {
@@ -44,6 +46,8 @@ public class Metrics {
     public float getWeight() {
         return weight;
     }
+
+    public Integer getSteps() { return steps; }
 
     public float getBmi() {
         return weight / (height * height);
@@ -66,6 +70,8 @@ public class Metrics {
     public void setWeight(float weight) {
         this.weight = weight;
     }
+
+    public void setSteps(Integer steps) { this.steps = steps; }
 
     public void setLocalDate(LocalDate localDate) { this.localDate = localDate; }
 

@@ -9,6 +9,7 @@ public record CreateMetricsRequest(
     @NotNull Sex sex,
     @Positive float height,
     @Positive float weight,
+    @NotNull Integer steps,
     @NotNull Long userId
 ) {
     public CreateMetricsRequest {

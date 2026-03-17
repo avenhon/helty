@@ -50,6 +50,7 @@ public class MetricsController {
                 metricsDTO.sex(),
                 metricsDTO.height(),
                 metricsDTO.weight(),
+                metricsDTO.steps(),
                 metricsDTO.userId()
         );
 

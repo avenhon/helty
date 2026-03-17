@@ -32,8 +32,9 @@ public class MetricsService {
         return metricsRepository.findById(metricsId).orElseThrow(() -> new MetricsNotFoundException(metricsId));
     }
 
-    public Metrics createMetrics(Sex sex, float height, float weight, Long userId) {
-        Metrics newMetrics = new Metrics(sex, height, weight);
+    public Metrics createMetrics(Sex sex, float height, float weight, Integer steps, Long userId) {
+        // Manual steps input it's a part of MVP, later will be Google Fit/Apple Health integration
+        Metrics newMetrics = new Metrics(sex, height, weight, steps);
 
         LocalDate localDate = LocalDate.now();
 
