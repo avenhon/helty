@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "metrics")
 public class Metrics {
     private @Id
     @GeneratedValue Long id;

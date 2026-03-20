@@ -8,7 +8,8 @@ import java.util.Set;
 @Entity
 @Table(name = "_user")
 public class User {
-    private @Id @GeneratedValue Long id;
+    @Id @GeneratedValue
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -16,6 +17,9 @@ public class User {
     private String username;
     @Column(nullable = false)
     private String password;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private RefreshToken refreshToken;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Metrics> metrics = new HashSet<>();

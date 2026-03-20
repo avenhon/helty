@@ -15,4 +15,5 @@ spring:
 
 jwt:
   secret: "|I:^tX.Lr}pP}0%pY33#a(Q^H*$lu954H)G^D%%|m=o"
-  expiration: 360000
+  access_token_expiration: 900000
+  refresh_token_expiration: 604800000
