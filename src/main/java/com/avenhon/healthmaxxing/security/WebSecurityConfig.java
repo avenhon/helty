@@ -16,9 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class WebSecurityConfig {
 
-    private CustomUserDetailsService userDetailsService;
-    private AuthEntryPointJwt unauthorizedHandler;
-    private JwtUtil jwtUtils;
+    private final CustomUserDetailsService userDetailsService;
+    private final AuthEntryPointJwt unauthorizedHandler;
+    private final JwtUtil jwtUtils;
 
     public WebSecurityConfig(CustomUserDetailsService userDetailsService,
                              AuthEntryPointJwt unauthorizedHandler,
@@ -61,6 +61,7 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(a ->
                         a.requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/user", "/api/v1/users").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 );
 

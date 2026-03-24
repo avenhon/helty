@@ -2,6 +2,8 @@ package com.avenhon.healthmaxxing.service;
 
 import java.util.Collections;
 
+import com.avenhon.healthmaxxing.exception.UserNotFoundByIdException;
+import com.avenhon.healthmaxxing.exception.UserNotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
-    User user = userRepository.findByUsername(username);
+    User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
 
     if (user == null) {
       throw new UsernameNotFoundException("User not found with username " + username);
@@ -31,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     return new org.springframework.security.core.userdetails.User(
       user.getUsername(),
       user.getPassword(),
-      Collections.emptyList()
+      user.getAuthorities()
     );
   }
 }

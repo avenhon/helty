@@ -1,7 +1,9 @@
 package com.avenhon.healthmaxxing.service;
 
 import com.avenhon.healthmaxxing.entity.User;
+import com.avenhon.healthmaxxing.enums.Role;
 import com.avenhon.healthmaxxing.exception.UserAlreadyExistsException;
+import com.avenhon.healthmaxxing.exception.UserNotFoundByIdException;
 import com.avenhon.healthmaxxing.exception.UserNotFoundException;
 import com.avenhon.healthmaxxing.exception.UsernameAlreadyTakenException;
 import com.avenhon.healthmaxxing.repository.UserRepository;
@@ -25,7 +27,11 @@ public class UserService {
     }
 
     public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundByIdException(userId));
+    }
+    
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
     }
 
     public String createUser(String email, String username, String rawPassword) throws UserAlreadyExistsException {
@@ -42,6 +48,8 @@ public class UserService {
                 username,
                 passwordEncoder.encode(rawPassword)
         );
+
+        user.setRole(Role.USER);
 
         userRepository.save(user);
         return "User registered successfully!";

@@ -11,6 +11,7 @@ import com.avenhon.healthmaxxing.security.JwtUtil;
 import com.avenhon.healthmaxxing.service.RefreshTokenService;
 import com.avenhon.healthmaxxing.service.TokenHashService;
 import com.avenhon.healthmaxxing.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,20 +43,28 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signin")
-    public AuthResponse authenticateUser(@RequestBody CreateUserRequest user) {
+    @Transactional
+    public AuthResponse authenticateUser(@RequestBody CreateUserRequest userRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        user.username(),
-                        user.password()
+                        userRequest.username(),
+                        userRequest.password()
                 )
         );
 
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         assert userDetails != null;
-        String accessToken = jwtUtils.generateAccessToken(userDetails.getUsername());
-        String refreshToken = jwtUtils.generateRefreshToken(userDetails.getUsername());
 
-        refreshTokenService.createRefreshToken(refreshToken, userDetails.getUsername());
+        User user = userService.getUserByUsername(userDetails.getUsername());
+
+        String accessToken = jwtUtils.generateAccessToken(user);
+        String refreshToken = jwtUtils.generateRefreshToken(user);
+
+        if (user.getRefreshToken() != null) {
+            refreshTokenService.updateRefreshToken(user.getRefreshToken(), refreshToken);
+        } else {
+            refreshTokenService.createRefreshToken(refreshToken, userDetails.getUsername());
+        }
 
         return new AuthResponse(
                 accessToken,
@@ -80,7 +89,7 @@ public class AuthenticationController {
 
         String tokenUsername = jwtUtils.getUserFromToken(rawRefreshToken);
 
-        RefreshToken refreshToken = refreshTokenService.findByUser(tokenUsername);
+        RefreshToken refreshToken = refreshTokenService.findByUsername(tokenUsername);
 
         if (!tokenHashService.hash(rawRefreshToken).equals(refreshToken.getToken())) {
             throw new RefreshTokenInvalidException(rawRefreshToken);
@@ -90,8 +99,8 @@ public class AuthenticationController {
             throw new RefreshTokenExpiredException(rawRefreshToken);
         }
 
-        String newAccessToken = jwtUtils.generateAccessToken(tokenUsername);
-        String newRefreshToken = jwtUtils.generateRefreshToken(tokenUsername);
+        String newAccessToken = jwtUtils.generateAccessToken(refreshToken.getUser());
+        String newRefreshToken = jwtUtils.generateRefreshToken(refreshToken.getUser());
 
         refreshTokenService.updateRefreshToken(refreshToken, newRefreshToken);
 

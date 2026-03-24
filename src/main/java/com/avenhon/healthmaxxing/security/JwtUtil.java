@@ -2,11 +2,10 @@ package com.avenhon.healthmaxxing.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
-import io.jsonwebtoken.Claims;
+import com.avenhon.healthmaxxing.entity.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -33,17 +32,17 @@ public class JwtUtil {
     key = Keys.hmacShaKeyFor(JWT_SECRET.getBytes(StandardCharsets.UTF_8));
   }
 
-  public String generateAccessToken(String username) {
-    return generateToken(username, ACCESS_TOKEN_EXPIRATION_MS);
+  public String generateAccessToken(User user) {
+    return generateToken(user, ACCESS_TOKEN_EXPIRATION_MS);
   }
 
-  public String generateRefreshToken(String username) {
-    return generateToken(username, REFRESH_TOKEN_EXPIRATION_MS);
+  public String generateRefreshToken(User user) {
+    return generateToken(user, REFRESH_TOKEN_EXPIRATION_MS);
   }
 
-  public String generateToken(String username, long expiration) {
+  public String generateToken(User user, long expiration) {
     return Jwts.builder()
-            .subject(username)
+            .subject(user.getUsername())
             .issuedAt(new Date())
             .expiration(new Date((new Date()).getTime() + expiration))
             .signWith(key)

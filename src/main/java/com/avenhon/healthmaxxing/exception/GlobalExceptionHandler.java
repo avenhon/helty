@@ -15,6 +15,13 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
+    @ExceptionHandler(UserNotFoundByIdException.class)
+    public ResponseEntity<String> handleUserNotFoundById(UserNotFoundByIdException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
+    }
+
     @ExceptionHandler(MetricsNotFoundException.class)
     public ResponseEntity<String> handleMetricsNotFound(MetricsNotFoundException ex) {
         return ResponseEntity

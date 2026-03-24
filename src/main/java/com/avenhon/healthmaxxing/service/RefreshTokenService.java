@@ -3,6 +3,7 @@ package com.avenhon.healthmaxxing.service;
 import com.avenhon.healthmaxxing.entity.RefreshToken;
 import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.exception.RefreshTokenNotFoundException;
+import com.avenhon.healthmaxxing.exception.UserNotFoundException;
 import com.avenhon.healthmaxxing.repository.RefreshTokenRepository;
 import com.avenhon.healthmaxxing.repository.UserRepository;
 import com.avenhon.healthmaxxing.security.JwtUtil;
@@ -23,7 +24,12 @@ public class RefreshTokenService {
     }
 
     public void createRefreshToken(String token, String username) {
-        RefreshToken refreshToken = new RefreshToken(tokenHashService.hash(token), jwtUtils.extractExpiration(token).toInstant(), userRepository.findByUsername(username));
+        RefreshToken refreshToken = new RefreshToken(
+                tokenHashService.hash(token),
+                jwtUtils.extractExpiration(token).toInstant(),
+                userRepository.findByUsername(username)
+                        .orElseThrow(() -> new UserNotFoundException(username))
+        );
 
         refreshTokenRepository.save(refreshToken);
     }
@@ -35,8 +41,8 @@ public class RefreshTokenService {
         refreshTokenRepository.save(refreshToken);
     }
 
-    public RefreshToken findByUser(String username) {
-        User user = userRepository.findByUsername(username);
+    public RefreshToken findByUsername(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
 
         return refreshTokenRepository.findByUser(user).orElseThrow(() -> new RefreshTokenNotFoundException(username));
     }

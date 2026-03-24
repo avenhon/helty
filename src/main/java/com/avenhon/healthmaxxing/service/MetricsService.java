@@ -5,7 +5,7 @@ import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.enums.Sex;
 import com.avenhon.healthmaxxing.exception.MetricsAlreadyExistsException;
 import com.avenhon.healthmaxxing.exception.MetricsNotFoundException;
-import com.avenhon.healthmaxxing.exception.UserNotFoundException;
+import com.avenhon.healthmaxxing.exception.UserNotFoundByIdException;
 import com.avenhon.healthmaxxing.repository.MetricsRepository;
 import com.avenhon.healthmaxxing.repository.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -40,7 +40,7 @@ public class MetricsService {
 
         newMetrics.setLocalDate(localDate);
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundByIdException(userId));
 
         user.addMetrics(newMetrics);
 
