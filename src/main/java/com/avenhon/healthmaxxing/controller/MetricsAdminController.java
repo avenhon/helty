@@ -51,6 +51,8 @@ public class MetricsAdminController {
                 metricsDTO.height(),
                 metricsDTO.weight(),
                 metricsDTO.steps(),
+                metricsDTO.sleepTime(),
+                metricsDTO.wakeTime(),
                 metricsDTO.userId()
         );
 

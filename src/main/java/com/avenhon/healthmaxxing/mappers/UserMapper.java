@@ -20,6 +20,8 @@ public class UserMapper {
                     m.getWeight(),
                     m.getBmi(),
                     m.getSteps(),
+                    m.getSleepTime(),
+                    m.getWakeTime(),
                     m.getLocalDate()
             )));
         }

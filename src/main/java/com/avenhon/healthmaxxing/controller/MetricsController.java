@@ -1,6 +1,5 @@
 package com.avenhon.healthmaxxing.controller;
 
-import com.avenhon.healthmaxxing.dto.CreateMetricsAdminRequest;
 import com.avenhon.healthmaxxing.dto.CreateMetricsUserRequest;
 import com.avenhon.healthmaxxing.dto.MetricsResponse;
 import com.avenhon.healthmaxxing.entity.Metrics;
@@ -9,7 +8,6 @@ import com.avenhon.healthmaxxing.mappers.MetricsMapper;
 import com.avenhon.healthmaxxing.service.MetricsService;
 import com.avenhon.healthmaxxing.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -57,17 +55,16 @@ public class MetricsController {
 
     @GetMapping("/today/bmi")
     public float getTodayMetricsBmi(Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
-
-        List<Metrics> metricsList = new ArrayList<>(user.getMetrics());
-
-        if (metricsList.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metrics not found for today");
-        }
-
-        Metrics latestMetrics = metricsList.getLast();
+        Metrics latestMetrics = getTodayMetrics(authentication.getName());
 
         return latestMetrics.getBmi();
+    }
+
+    @GetMapping("/today/sleep")
+    public float getTodaySleep(Authentication authentication) {
+        Metrics latestMetrics = getTodayMetrics(authentication.getName());
+
+        return latestMetrics.getSleepHours();
     }
 
     @PostMapping
@@ -80,9 +77,24 @@ public class MetricsController {
                 metricsDTO.height(),
                 metricsDTO.weight(),
                 metricsDTO.steps(),
+                metricsDTO.sleepTime(),
+                metricsDTO.wakeTime(),
                 user.getId()
         );
 
         return toResponse(metrics);
+    }
+
+    // Helpers
+    private Metrics getTodayMetrics(String username) {
+        User user = userService.getUserByUsername(username);
+
+        List<Metrics> metricsList = new ArrayList<>(user.getMetrics());
+
+        if (metricsList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metrics not found for today");
+        }
+
+        return metricsList.getLast();
     }
 }

@@ -12,6 +12,8 @@ public class MetricsMapper {
               metrics.getWeight(),
               metrics.getBmi(),
               metrics.getSteps(),
+              metrics.getSleepTime(),
+              metrics.getWakeTime(),
               metrics.getLocalDate()
       );
     }

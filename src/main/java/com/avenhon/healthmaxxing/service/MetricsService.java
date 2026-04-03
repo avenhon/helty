@@ -11,6 +11,7 @@ import com.avenhon.healthmaxxing.repository.UserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,9 +33,9 @@ public class MetricsService {
         return metricsRepository.findById(metricsId).orElseThrow(() -> new MetricsNotFoundException(metricsId));
     }
 
-    public Metrics createMetrics(Sex sex, float height, float weight, Integer steps, Long userId) {
+    public Metrics createMetrics(Sex sex, float height, float weight, Integer steps, Instant sleepTime, Instant wakeTime, Long userId) {
         // Manual steps input it's a part of MVP, later will be Google Fit/Apple Health integration
-        Metrics newMetrics = new Metrics(sex, height, weight, steps);
+        Metrics newMetrics = new Metrics(sex, height, weight, steps, sleepTime, wakeTime);
 
         LocalDate localDate = LocalDate.now();
 

@@ -3,6 +3,8 @@ package com.avenhon.healthmaxxing.entity;
 import com.avenhon.healthmaxxing.enums.Sex;
 import jakarta.persistence.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
@@ -15,6 +17,8 @@ public class Metrics {
     private float height;
     private float weight;
     private Integer steps;
+    private Instant sleepTime;
+    private Instant wakeTime;
 
     @Column(unique = true, nullable = false)
     private LocalDate localDate;
@@ -25,11 +29,13 @@ public class Metrics {
 
     public Metrics() {}
 
-    public Metrics(Sex sex, float height, float weight, Integer steps) {
+    public Metrics(Sex sex, float height, float weight, Integer steps, Instant sleepTime, Instant wakeTime) {
         this.sex = sex;
         this.height = height;
         this.weight = weight;
         this.steps = steps;
+        this.sleepTime = sleepTime;
+        this.wakeTime = wakeTime;
     }
 
     public Long getId() {
@@ -50,8 +56,18 @@ public class Metrics {
 
     public Integer getSteps() { return steps; }
 
+    public Instant getSleepTime() { return sleepTime; }
+
+    public Instant getWakeTime() { return wakeTime; }
+
     public float getBmi() {
         return weight / (height * height);
+    }
+
+    public float getSleepHours() {
+        Duration duration = Duration.between(getSleepTime(), getWakeTime());
+
+        return duration.toMinutes() / 60.0f;
     }
 
     public LocalDate getLocalDate() { return localDate; }
@@ -73,6 +89,10 @@ public class Metrics {
     }
 
     public void setSteps(Integer steps) { this.steps = steps; }
+
+    public void setSleepTime(Instant sleepTime) { this.sleepTime = sleepTime; }
+
+    public void setWakeTime(Instant wakeTime) { this.wakeTime = wakeTime; }
 
     public void setLocalDate(LocalDate localDate) { this.localDate = localDate; }
 
