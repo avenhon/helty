@@ -70,4 +70,11 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ex.getMessage());
     }
+
+    @ExceptionHandler(SleepTimeInvalidException.class)
+    public ResponseEntity<String> handleSleepTimeInvalidException(SleepTimeInvalidException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
 }
