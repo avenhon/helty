@@ -11,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -18,14 +19,17 @@ public class WebSecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
+    private final AccessDeniedHandler accessDeniedHandler;
     private final JwtUtil jwtUtils;
 
     public WebSecurityConfig(CustomUserDetailsService userDetailsService,
                              AuthEntryPointJwt unauthorizedHandler,
+                             AccessDeniedHandler accessDeniedHandler,
                              JwtUtil jwtUtils
     ) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
+        this.accessDeniedHandler = accessDeniedHandler;
         this.jwtUtils = jwtUtils;
     }
 
@@ -51,8 +55,9 @@ public class WebSecurityConfig {
         http.
                 csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .exceptionHandling(e ->
-                        e.authenticationEntryPoint(unauthorizedHandler)
+                .exceptionHandling(e -> e
+                        .accessDeniedHandler(accessDeniedHandler)
+                        .authenticationEntryPoint(unauthorizedHandler)
                 )
                 .sessionManagement(s ->
                         s.sessionCreationPolicy(
@@ -61,7 +66,7 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(a ->
                         a.requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers("/api/v1/admin/***").hasRole("ADMIN")
+                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 );
 

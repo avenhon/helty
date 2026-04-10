@@ -66,7 +66,7 @@ public class JwtUtil {
           .parseSignedClaims(token);
       return true;
     } catch (JwtException e) {
-      throw new RuntimeException(e);
+      return false;
     }
   }
 
