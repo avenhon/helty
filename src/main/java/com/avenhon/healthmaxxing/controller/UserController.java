@@ -1,12 +1,11 @@
 package com.avenhon.healthmaxxing.controller;
 
+import static com.avenhon.healthmaxxing.mappers.UserMapper.toResponse;
+
 import com.avenhon.healthmaxxing.dto.UserResponse;
-import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import static com.avenhon.healthmaxxing.mappers.UserMapper.toResponse;
 
 @RestController
 @RequestMapping("/api/v1/users")

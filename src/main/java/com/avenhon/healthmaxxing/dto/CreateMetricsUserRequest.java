@@ -4,7 +4,6 @@ import com.avenhon.healthmaxxing.enums.Sex;
 import com.avenhon.healthmaxxing.exception.SleepTimeInvalidException;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-
 import java.time.Duration;
 import java.time.Instant;
 
@@ -14,8 +13,7 @@ public record CreateMetricsUserRequest(
         @Positive float weight,
         @NotNull Integer steps,
         @NotNull Instant sleepTime,
-        @NotNull Instant wakeTime
-) {
+        @NotNull Instant wakeTime) {
     public CreateMetricsUserRequest {
         if (height > 3) {
             height = height / 100f;
@@ -23,7 +21,6 @@ public record CreateMetricsUserRequest(
 
         Instant now = Instant.now();
         Duration duration = Duration.between(sleepTime, wakeTime);
-        Duration durationBetweenNow = Duration.between(wakeTime, now);
 
         if (sleepTime.isAfter(wakeTime)) {
             throw new SleepTimeInvalidException();
