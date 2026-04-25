@@ -40,17 +40,7 @@ public class MetricsController {
 
     @GetMapping("/today")
     public MetricsResponse getTodayMetrics(Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
-
-        List<Metrics> metricsList = new ArrayList<>(user.getMetrics());
-
-        if (metricsList.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metrics not found for today");
-        }
-
-        Metrics latestMetrics = metricsList.getLast();
-
-        return toResponse(latestMetrics);
+        return toResponse(metricsService.getTodayMetricsByUsername(authentication.getName()));
     }
 
     @GetMapping("/today/bmi")

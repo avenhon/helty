@@ -3,26 +3,26 @@ package com.avenhon.healthmaxxing.service;
 import com.avenhon.healthmaxxing.entity.Metrics;
 import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.enums.Sex;
-import com.avenhon.healthmaxxing.exception.MetricsAlreadyExistsException;
 import com.avenhon.healthmaxxing.exception.MetricsNotFoundException;
-import com.avenhon.healthmaxxing.exception.UserNotFoundByIdException;
 import com.avenhon.healthmaxxing.repository.MetricsRepository;
 import com.avenhon.healthmaxxing.repository.UserRepository;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class MetricsService {
     private final MetricsRepository metricsRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public MetricsService(MetricsRepository metricsRepository, UserRepository userRepository) {
+    public MetricsService(MetricsRepository metricsRepository, UserRepository userRepository, UserService userService) {
         this.metricsRepository = metricsRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public List<Metrics> getAllMetrics() {
@@ -33,6 +33,18 @@ public class MetricsService {
         return metricsRepository.findById(metricsId).orElseThrow(() -> new MetricsNotFoundException(metricsId));
     }
 
+    public Metrics getTodayMetricsByUsername(String username) {
+        User user = userService.getUserByUsername(username);
+
+        List<Metrics> metricsList = new ArrayList<>(user.getMetrics());
+
+        if (metricsList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metrics not found for today");
+        }
+
+        return metricsList.getLast();
+    }
+
     public Metrics createMetrics(Sex sex, float height, float weight, Integer steps, Instant sleepTime, Instant wakeTime, Long userId) {
         // Manual steps input it's a part of MVP, later will be Google Fit/Apple Health integration
         Metrics newMetrics = new Metrics(sex, height, weight, steps, sleepTime, wakeTime);
@@ -41,15 +53,8 @@ public class MetricsService {
 
         newMetrics.setLocalDate(localDate);
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundByIdException(userId));
+        userService.addMetrics(userId, newMetrics);
 
-        user.addMetrics(newMetrics);
-
-        try {
-            userRepository.save(user);
-        } catch (DataIntegrityViolationException ex) {
-            throw new MetricsAlreadyExistsException();
-        }
         return newMetrics;
     }
 }

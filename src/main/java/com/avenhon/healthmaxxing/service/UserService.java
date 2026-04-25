@@ -1,5 +1,6 @@
 package com.avenhon.healthmaxxing.service;
 
+import com.avenhon.healthmaxxing.entity.Metrics;
 import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.enums.Role;
 import com.avenhon.healthmaxxing.exception.UserAlreadyExistsException;
@@ -51,5 +52,11 @@ public class UserService {
 
         userRepository.save(user);
         return "User registered successfully!";
+    }
+
+    public void addMetrics(Long userId, Metrics metrics) {
+        User user = getUserById(userId);
+        user.addMetrics(metrics);
+        userRepository.save(user);
     }
 }
