@@ -18,34 +18,7 @@ public class InsightsService {
     }
 
     public InsightsResponse prepareTodayInsight(String username) {
-        Metrics todayMetrics = metricsService.getTodayMetricsByUsername(username);
-        int sleepScore = calculateSleepScore(todayMetrics);
-        int bmiScore = calculateBMIScore(todayMetrics);
-        int stepsScore = calculateStepsScore(todayMetrics);
-
-        MetricInsightDTO sleepMetric = new MetricInsightDTO(
-                InsightMetricsTypes.SLEEP,
-                sleepScore,
-                determineStatus(sleepScore)
-        );
-
-        MetricInsightDTO bmiMetric = new MetricInsightDTO(
-                InsightMetricsTypes.BMI,
-                bmiScore,
-                determineStatus(bmiScore)
-        );
-
-        MetricInsightDTO stepsMetric = new MetricInsightDTO(
-                InsightMetricsTypes.STEPS,
-                stepsScore,
-                determineStatus(stepsScore)
-        );
-
-        List<MetricInsightDTO> metrics = List.of(sleepMetric, bmiMetric, stepsMetric);
-
-        int summaryScore = (int) (sleepScore * 0.5 + bmiScore * 0.2 + stepsScore * 0.3);
-
-        return new InsightsResponse(summaryScore, determineStatus(summaryScore), metrics, "");
+        return createInsights(metricsService.getTodayMetricsByUsername(username));
     }
 
     private static final double K = 8;
@@ -86,5 +59,55 @@ public class InsightsService {
         if (score >= 50) return InsightMetricsStatuses.AVERAGE;
         if (score >= 30) return InsightMetricsStatuses.POOR;
         return InsightMetricsStatuses.CRITICAL;
+    }
+
+    private InsightsResponse createInsights(Metrics metrics) {
+        int sleepScore = calculateSleepScore(metrics);
+        int bmiScore = calculateBMIScore(metrics);
+        int stepsScore = calculateStepsScore(metrics);
+
+        MetricInsightDTO sleepMetric = new MetricInsightDTO(
+                InsightMetricsTypes.SLEEP,
+                sleepScore,
+                determineStatus(sleepScore)
+        );
+
+        MetricInsightDTO bmiMetric = new MetricInsightDTO(
+                InsightMetricsTypes.BMI,
+                bmiScore,
+                determineStatus(bmiScore)
+        );
+
+        MetricInsightDTO stepsMetric = new MetricInsightDTO(
+                InsightMetricsTypes.STEPS,
+                stepsScore,
+                determineStatus(stepsScore)
+        );
+
+        List<MetricInsightDTO> insightsMetrics = List.of(sleepMetric, bmiMetric, stepsMetric);
+
+        int summaryScore = (int) (sleepScore * 0.5 + bmiScore * 0.2 + stepsScore * 0.3);
+        String summaryText = "";
+
+        if (sleepMetric.status() == InsightMetricsStatuses.POOR ||
+                sleepMetric.status() == InsightMetricsStatuses.CRITICAL) {
+            summaryText += "It's highly recommended to resting and sleep more\n";
+        }
+
+        if (bmiMetric.status() == InsightMetricsStatuses.POOR ||
+                bmiMetric.status() == InsightMetricsStatuses.CRITICAL) {
+            summaryText += "Take care of your diet, problems with weight may cause heart diseases\n";
+        }
+
+        if (stepsMetric.status() == InsightMetricsStatuses.POOR ||
+                stepsMetric.status() == InsightMetricsStatuses.CRITICAL) {
+            summaryText += "Give attention to your daily steps count. Highly recommended to have more than 5000 steps per day.";
+        }
+
+        if (summaryText.isEmpty()) {
+            summaryText += "Everything is good! Great job!";
+        }
+
+        return new InsightsResponse(summaryScore, determineStatus(summaryScore), insightsMetrics, summaryText);
     }
 }
