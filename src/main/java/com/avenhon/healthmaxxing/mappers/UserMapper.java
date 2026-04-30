@@ -22,6 +22,7 @@ public class UserMapper {
                     m.getSteps(),
                     m.getSleepTime(),
                     m.getWakeTime(),
+                    m.getSleepHours(),
                     m.getLocalDate()
             )));
         }

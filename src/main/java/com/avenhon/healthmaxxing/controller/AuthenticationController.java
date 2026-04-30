@@ -7,6 +7,7 @@ import com.avenhon.healthmaxxing.entity.RefreshToken;
 import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.exception.RefreshTokenExpiredException;
 import com.avenhon.healthmaxxing.exception.RefreshTokenInvalidException;
+import com.avenhon.healthmaxxing.security.CustomUserDetails;
 import com.avenhon.healthmaxxing.security.JwtUtil;
 import com.avenhon.healthmaxxing.service.RefreshTokenService;
 import com.avenhon.healthmaxxing.service.TokenHashService;
@@ -52,10 +53,10 @@ public class AuthenticationController {
                 )
         );
 
-        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        final CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         assert userDetails != null;
 
-        User user = userService.getUserByUsername(userDetails.getUsername());
+        User user = userService.getUserById(userDetails.getId());
 
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user);

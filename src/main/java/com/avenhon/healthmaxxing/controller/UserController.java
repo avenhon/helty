@@ -3,8 +3,10 @@ package com.avenhon.healthmaxxing.controller;
 import static com.avenhon.healthmaxxing.mappers.UserMapper.toResponse;
 
 import com.avenhon.healthmaxxing.dto.UserResponse;
+import com.avenhon.healthmaxxing.security.CustomUserDetails;
 import com.avenhon.healthmaxxing.service.UserService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +19,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public UserResponse getUser(Authentication authentication) {
-        return toResponse(userService.getUserByUsername(authentication.getName()));
+    public UserResponse getUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return toResponse(userService.getUserById(userDetails.getId()));
     }
 }

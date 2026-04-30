@@ -17,17 +17,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class WebSecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
     private final AccessDeniedHandler accessDeniedHandler;
     private final JwtUtil jwtUtils;
 
-    public WebSecurityConfig(CustomUserDetailsService userDetailsService,
-                             AuthEntryPointJwt unauthorizedHandler,
+    public WebSecurityConfig(AuthEntryPointJwt unauthorizedHandler,
                              AccessDeniedHandler accessDeniedHandler,
                              JwtUtil jwtUtils
     ) {
-        this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
         this.accessDeniedHandler = accessDeniedHandler;
         this.jwtUtils = jwtUtils;
@@ -35,7 +32,7 @@ public class WebSecurityConfig {
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter(jwtUtils, userDetailsService);
+        return new AuthTokenFilter(jwtUtils);
     }
 
     @Bean

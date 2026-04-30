@@ -14,5 +14,6 @@ public record MetricsResponse(
         Integer steps,
         Instant sleepTime,
         Instant wakeTime,
+        float sleepHours,
         LocalDate localDate
 ) {}

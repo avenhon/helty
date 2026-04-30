@@ -5,14 +5,12 @@ import com.avenhon.healthmaxxing.dto.MetricsResponse;
 import com.avenhon.healthmaxxing.entity.Metrics;
 import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.mappers.MetricsMapper;
+import com.avenhon.healthmaxxing.security.CustomUserDetails;
 import com.avenhon.healthmaxxing.service.MetricsService;
 import com.avenhon.healthmaxxing.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.avenhon.healthmaxxing.mappers.MetricsMapper.toResponse;
@@ -29,38 +27,26 @@ public class MetricsController {
     }
 
     @GetMapping
-    public List<MetricsResponse> getAllMetrics(Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
+    public List<MetricsResponse> getAllMetrics(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long userId = userDetails.getId();
 
-        return user.getMetrics()
+        return metricsService.getMetricsByUserId(userId)
                 .stream()
                 .map(MetricsMapper::toResponse)
                 .toList();
     }
 
     @GetMapping("/today")
-    public MetricsResponse getTodayMetrics(Authentication authentication) {
-        return toResponse(metricsService.getTodayMetricsByUsername(authentication.getName()));
-    }
-
-    @GetMapping("/today/bmi")
-    public float getTodayMetricsBmi(Authentication authentication) {
-        Metrics latestMetrics = getTodayMetrics(authentication.getName());
-
-        return latestMetrics.getBmi();
-    }
-
-    @GetMapping("/today/sleep")
-    public float getTodaySleep(Authentication authentication) {
-        Metrics latestMetrics = getTodayMetrics(authentication.getName());
-
-        return latestMetrics.getSleepHours();
+    public MetricsResponse getTodayMetrics(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Metrics today = metricsService.getTodayMetricsByUserId(userDetails.getId());
+        return toResponse(today);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MetricsResponse createUserMetrics(@RequestBody CreateMetricsUserRequest metricsDTO, Authentication authentication) {
-        User user = userService.getUserByUsername(authentication.getName());
+    public MetricsResponse createUserMetrics(@RequestBody CreateMetricsUserRequest metricsDTO,
+                                             @AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userService.getUserById(userDetails.getId());
 
         Metrics metrics = metricsService.createMetrics(
                 metricsDTO.sex(),
@@ -73,18 +59,5 @@ public class MetricsController {
         );
 
         return toResponse(metrics);
-    }
-
-    // Helpers
-    private Metrics getTodayMetrics(String username) {
-        User user = userService.getUserByUsername(username);
-
-        List<Metrics> metricsList = new ArrayList<>(user.getMetrics());
-
-        if (metricsList.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metrics not found for today");
-        }
-
-        return metricsList.getLast();
     }
 }

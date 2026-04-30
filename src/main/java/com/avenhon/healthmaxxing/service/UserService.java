@@ -30,10 +30,6 @@ public class UserService {
     public User getUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundByIdException(userId));
     }
-    
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
-    }
 
     public String createUser(String email, String username, String rawPassword) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(email)) {

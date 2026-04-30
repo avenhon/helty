@@ -1,8 +1,10 @@
 package com.avenhon.healthmaxxing.controller;
 
 import com.avenhon.healthmaxxing.dto.InsightsResponse;
+import com.avenhon.healthmaxxing.security.CustomUserDetails;
 import com.avenhon.healthmaxxing.service.InsightsService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +19,7 @@ public class InsightsController {
     }
 
     @GetMapping
-    public InsightsResponse getTodayInsights(Authentication authentication) {
-        return insightsService.prepareTodayInsight(authentication.getName());
+    public InsightsResponse getTodayInsights(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return insightsService.prepareTodayInsight(userDetails.getId());
     }
 }

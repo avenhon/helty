@@ -29,14 +29,16 @@ public class MetricsService {
         return metricsRepository.findAll();
     }
 
+    public List<Metrics> getMetricsByUserId(Long userId) {
+        return metricsRepository.findAllByUserId(userId);
+    }
+
     public Metrics getMetricsById(Long metricsId) {
         return metricsRepository.findById(metricsId).orElseThrow(() -> new MetricsNotFoundException(metricsId));
     }
 
-    public Metrics getTodayMetricsByUsername(String username) {
-        User user = userService.getUserByUsername(username);
-
-        List<Metrics> metricsList = new ArrayList<>(user.getMetrics());
+    public Metrics getTodayMetricsByUserId(Long userId) {
+        List<Metrics> metricsList = new ArrayList<>(metricsRepository.findAllByUserId(userId));
 
         if (metricsList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metrics not found for today");

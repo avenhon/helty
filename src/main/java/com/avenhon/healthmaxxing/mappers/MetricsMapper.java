@@ -14,6 +14,7 @@ public class MetricsMapper {
               metrics.getSteps(),
               metrics.getSleepTime(),
               metrics.getWakeTime(),
+              metrics.getSleepHours(),
               metrics.getLocalDate()
       );
     }

@@ -1,12 +1,15 @@
 package com.avenhon.healthmaxxing.security;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
 
 import com.avenhon.healthmaxxing.entity.User;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.JwtException;
@@ -41,7 +44,14 @@ public class JwtUtil {
   }
 
   public String generateToken(User user, long expiration) {
+    Map<String, Object> claims = new HashMap<>();
+    claims.put("userId", user.getId());
+    claims.put("roles", user.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList()));
+
     return Jwts.builder()
+            .claims(claims)
             .subject(user.getUsername())
             .issuedAt(new Date())
             .expiration(new Date((new Date()).getTime() + expiration))
@@ -49,13 +59,24 @@ public class JwtUtil {
             .compact();
   }
 
-  public String getUserFromToken(String token) {
+  private Claims getAllClaims(String token) {
     return Jwts.parser()
-        .verifyWith(key)
-        .build()
-        .parseSignedClaims(token)
-        .getPayload()
-        .getSubject();
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+  }
+
+  public String getUserFromToken(String token) {
+    return getAllClaims(token).getSubject();
+  }
+
+  public Long getUserIdFromToken(String token) {
+    return ((Number) getAllClaims(token).get("userId")).longValue();
+  }
+
+  public List<String> getRolesFromToken(String token) {
+    return (List<String>) getAllClaims(token).get("roles");
   }
 
   public boolean validateJwtToken(String token) {

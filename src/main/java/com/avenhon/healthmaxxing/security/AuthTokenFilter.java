@@ -6,20 +6,22 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
-    private CustomUserDetailsService userDetailsService;
 
-    public AuthTokenFilter(JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService) {
+    public AuthTokenFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-        this.userDetailsService = customUserDetailsService;
     }
 
     @Override
@@ -29,9 +31,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
+                final Long userId = jwtUtil.getUserIdFromToken(jwt);
                 final String username = jwtUtil.getUserFromToken(jwt);
-                final UserDetails userDetails =
-                        userDetailsService.loadUserByUsername(username);
+                final List<String> roles = jwtUtil.getRolesFromToken(jwt);
+
+                List<GrantedAuthority> authorities = roles.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+                CustomUserDetails userDetails = new CustomUserDetails(userId, username, null, authorities);
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,

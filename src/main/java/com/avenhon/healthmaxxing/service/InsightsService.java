@@ -17,8 +17,8 @@ public class InsightsService {
         this.metricsService = metricsService;
     }
 
-    public InsightsResponse prepareTodayInsight(String username) {
-        return createInsights(metricsService.getTodayMetricsByUsername(username));
+    public InsightsResponse prepareTodayInsight(Long userId) {
+        return createInsights(metricsService.getTodayMetricsByUserId(userId));
     }
 
     private static final double K = 8;

@@ -36,13 +36,6 @@ public class MetricsAdminController {
         return toResponse(metrics);
     }
 
-    @GetMapping("/{metricsId}/bmi")
-    public float getMetricsBmi(@PathVariable Long metricsId) {
-        Metrics metrics = metricsService.getMetricsById(metricsId);
-
-        return metrics.getBmi();
-    }
-
     @PostMapping("/admin")
     @ResponseStatus(HttpStatus.CREATED)
     public MetricsResponse createMetrics(@RequestBody CreateMetricsAdminRequest metricsDTO) {
