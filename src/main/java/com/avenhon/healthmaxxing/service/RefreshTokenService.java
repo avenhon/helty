@@ -12,24 +12,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserRepository userRepository;
     private final TokenHashService tokenHashService;
     private final JwtUtil jwtUtils;
+    private final UserService userService;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, TokenHashService tokenHashService, JwtUtil jwtUtils) {
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, TokenHashService tokenHashService, JwtUtil jwtUtils, UserService userService) {
         this.refreshTokenRepository = refreshTokenRepository;
-        this.userRepository = userRepository;
         this.tokenHashService = tokenHashService;
         this.jwtUtils = jwtUtils;
+        this.userService = userService;
     }
 
-    public void createRefreshToken(String token, String username) {
-        RefreshToken refreshToken = new RefreshToken(
-                tokenHashService.hash(token),
-                jwtUtils.extractExpiration(token).toInstant(),
-                userRepository.findByUsername(username)
-                        .orElseThrow(() -> new UserNotFoundException(username))
-        );
+    public void createRefreshToken(String token, Long userId) {
+        RefreshToken refreshToken = RefreshToken.builder()
+                .token(tokenHashService.hash(token))
+                .expirationDate(jwtUtils.extractExpiration(token).toInstant())
+                .user(userService.getUserById(userId))
+                .build();
 
         refreshTokenRepository.save(refreshToken);
     }
@@ -41,9 +40,9 @@ public class RefreshTokenService {
         refreshTokenRepository.save(refreshToken);
     }
 
-    public RefreshToken findByUsername(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+    public RefreshToken findByUserId(Long userId) {
+        User user = userService.getUserById(userId);
 
-        return refreshTokenRepository.findByUser(user).orElseThrow(() -> new RefreshTokenNotFoundException(username));
+        return refreshTokenRepository.findByUser(user).orElseThrow(() -> new RefreshTokenNotFoundException(user.getUsername()));
     }
 }

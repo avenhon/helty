@@ -40,11 +40,11 @@ public class UserService {
             throw new UsernameAlreadyTakenException(username);
         }
 
-        User user = new User(
-                email,
-                username,
-                passwordEncoder.encode(rawPassword)
-        );
+        User user = User.builder()
+                .email(email)
+                .username(username)
+                .password(passwordEncoder.encode(rawPassword))
+                .build();
 
         userRepository.save(user);
         return "User registered successfully!";

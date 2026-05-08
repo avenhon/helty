@@ -2,6 +2,7 @@ package com.avenhon.healthmaxxing.entity;
 
 import com.avenhon.healthmaxxing.enums.Sex;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -9,6 +10,11 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "metrics")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Metrics {
     private @Id
     @GeneratedValue Long id;
@@ -27,39 +33,6 @@ public class Metrics {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
-    public Metrics() {}
-
-    public Metrics(Sex sex, float height, float weight, Integer steps, Instant sleepTime, Instant wakeTime) {
-        this.sex = sex;
-        this.height = height;
-        this.weight = weight;
-        this.steps = steps;
-        this.sleepTime = sleepTime;
-        this.wakeTime = wakeTime;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Sex getSex() {
-        return sex;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
-    public float getWeight() {
-        return weight;
-    }
-
-    public Integer getSteps() { return steps; }
-
-    public Instant getSleepTime() { return sleepTime; }
-
-    public Instant getWakeTime() { return wakeTime; }
-
     public float getBmi() {
         return weight / (height * height);
     }
@@ -68,35 +41,5 @@ public class Metrics {
         Duration duration = Duration.between(getSleepTime(), getWakeTime());
 
         return duration.toMinutes() / 60.0f;
-    }
-
-    public LocalDate getLocalDate() { return localDate; }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setSex(Sex sex) {
-        this.sex = sex;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
-    public void setWeight(float weight) {
-        this.weight = weight;
-    }
-
-    public void setSteps(Integer steps) { this.steps = steps; }
-
-    public void setSleepTime(Instant sleepTime) { this.sleepTime = sleepTime; }
-
-    public void setWakeTime(Instant wakeTime) { this.wakeTime = wakeTime; }
-
-    public void setLocalDate(LocalDate localDate) { this.localDate = localDate; }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

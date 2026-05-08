@@ -64,7 +64,7 @@ public class AuthenticationController {
         if (user.getRefreshToken() != null) {
             refreshTokenService.updateRefreshToken(user.getRefreshToken(), refreshToken);
         } else {
-            refreshTokenService.createRefreshToken(refreshToken, userDetails.getUsername());
+            refreshTokenService.createRefreshToken(refreshToken, userDetails.getId());
         }
 
         return new AuthResponse(
@@ -88,9 +88,8 @@ public class AuthenticationController {
             throw new RefreshTokenInvalidException(rawRefreshToken);
         }
 
-        String tokenUsername = jwtUtils.getUserFromToken(rawRefreshToken);
-
-        RefreshToken refreshToken = refreshTokenService.findByUsername(tokenUsername);
+        Long userId = jwtUtils.getUserIdFromToken(rawRefreshToken);
+        RefreshToken refreshToken = refreshTokenService.findByUserId(userId);
 
         if (!tokenHashService.hash(rawRefreshToken).equals(refreshToken.getToken())) {
             throw new RefreshTokenInvalidException(rawRefreshToken);

@@ -49,7 +49,14 @@ public class MetricsService {
 
     public Metrics createMetrics(Sex sex, float height, float weight, Integer steps, Instant sleepTime, Instant wakeTime, Long userId) {
         // Manual steps input it's a part of MVP, later will be Google Fit/Apple Health integration
-        Metrics newMetrics = new Metrics(sex, height, weight, steps, sleepTime, wakeTime);
+        Metrics newMetrics = Metrics.builder()
+                .sex(sex)
+                .height(height)
+                .weight(weight)
+                .steps(steps)
+                .sleepTime(sleepTime)
+                .wakeTime(wakeTime)
+                .build();
 
         LocalDate localDate = LocalDate.now();
 
