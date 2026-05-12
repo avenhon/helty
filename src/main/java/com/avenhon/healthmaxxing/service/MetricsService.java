@@ -4,6 +4,7 @@ import com.avenhon.healthmaxxing.entity.Metrics;
 import com.avenhon.healthmaxxing.entity.User;
 import com.avenhon.healthmaxxing.enums.Sex;
 import com.avenhon.healthmaxxing.exception.MetricsNotFoundException;
+import com.avenhon.healthmaxxing.exception.TodayMetricsNotFoundException;
 import com.avenhon.healthmaxxing.repository.MetricsRepository;
 import com.avenhon.healthmaxxing.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -41,10 +42,16 @@ public class MetricsService {
         List<Metrics> metricsList = new ArrayList<>(metricsRepository.findAllByUserId(userId));
 
         if (metricsList.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Metrics not found for today");
+            throw new TodayMetricsNotFoundException();
         }
 
-        return metricsList.getLast();
+        Metrics lastUserMetrics = metricsList.getLast();
+
+        if (!lastUserMetrics.getLocalDate().equals(LocalDate.now())) {
+            throw new TodayMetricsNotFoundException();
+        }
+
+        return lastUserMetrics;
     }
 
     public Metrics createMetrics(Sex sex, float height, float weight, Integer steps, Instant sleepTime, Instant wakeTime, Long userId) {

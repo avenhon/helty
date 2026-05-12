@@ -24,6 +24,7 @@ public class InsightsService {
     private static final double K = 8;
 
     private int calculateSleepScore(Metrics metrics) {
+        float sleepHours = metrics.getSleepHours();
         double sleepCycles = (metrics.getSleepHours() * 60f) / 90f;
 
         // K here it's penalty coefficient: how strictly deviation from 5 cycles is punished
